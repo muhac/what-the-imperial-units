@@ -1,0 +1,35 @@
+# 自动将构建好的 React 应用发布到 GitHub Pages
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # 自动生成的访问令牌
+          publish_dir: ./build                       # 构建输出目录
+          publish_branch: gh-pages                   # 发布到 gh-pages 分支
+          allow_empty_commit: true                   # 当无变动时允许空提交
+          cname: units.muhan.org                     # 自定义域名，生成 CNAME 文件
