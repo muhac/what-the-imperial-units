@@ -9,10 +9,16 @@ type ImperialUnit =
     | 'ounce'
     | 'pound'
     | 'gallon'
+    | 'fluid_ounce'
+    | 'pint'
+    | 'quart'
     | 'fahrenheit'
     | 'square_feet'
     | 'acres'
-    | 'miles_per_hour';
+    | 'square_miles'
+    | 'miles_per_hour'
+    | 'feet_per_second'
+    | 'knots';
 
 // Metric units
 type MetricUnit =
@@ -22,10 +28,13 @@ type MetricUnit =
     | 'grams'
     | 'kilograms'
     | 'liters'
+    | 'milliliters'
     | 'celsius'
     | 'square_meters'
     | 'hectares'
-    | 'kilometers_per_hour';
+    | 'square_kilometers'
+    | 'kilometers_per_hour'
+    | 'meters_per_second';
 
 // Union of all units
 type Unit = ImperialUnit | MetricUnit;
@@ -46,18 +55,27 @@ export const baseMap: Record<Unit, { factor: number; category: string }> = {
     kilograms: {factor: 1, category: 'weight'},
     // Volume
     liters: {factor: 1, category: 'volume'},
+    milliliters: {factor: 0.001, category: 'volume'},
     gallon: {factor: 3.78541, category: 'volume'},
+    fluid_ounce: {factor: 0.0295735, category: 'volume'},
+    pint: {factor: 0.473176, category: 'volume'},
+    quart: {factor: 0.946353, category: 'volume'},
     // Temperature
     celsius: {factor: 1, category: 'temperature'},
     fahrenheit: {factor: 1, category: 'temperature'},
     // Area
     square_meters: {factor: 1, category: 'area'},
     hectares: {factor: 10000, category: 'area'},
+    square_kilometers: {factor: 1000000, category: 'area'},
     square_feet: {factor: 0.092903, category: 'area'},
     acres: {factor: 4046.86, category: 'area'},
+    square_miles: {factor: 2589988.11, category: 'area'},
     // Speed
     kilometers_per_hour: {factor: 0.277778, category: 'speed'}, // m/s base
     miles_per_hour: {factor: 0.44704, category: 'speed'},
+    meters_per_second: {factor: 1, category: 'speed'},
+    feet_per_second: {factor: 0.3048, category: 'speed'},
+    knots: {factor: 0.514444, category: 'speed'},
 };
 
 export const fToC = (f: number) => (f - 32) * (5 / 9);
@@ -75,20 +93,20 @@ export const unitCategories = {
         imperial: ['ounce', 'pound'] as ImperialUnit[],
     },
     volume: {
-        metric: ['liters'] as MetricUnit[],
-        imperial: ['gallon'] as ImperialUnit[],
+        metric: ['liters', 'milliliters'] as MetricUnit[],
+        imperial: ['gallon', 'fluid_ounce', 'pint', 'quart'] as ImperialUnit[],
+    },
+    area: {
+        metric: ['square_meters', 'hectares', 'square_kilometers'] as MetricUnit[],
+        imperial: ['square_feet', 'acres', 'square_miles'] as ImperialUnit[],
+    },
+    speed: {
+        metric: ['kilometers_per_hour', 'meters_per_second'] as MetricUnit[],
+        imperial: ['miles_per_hour', 'feet_per_second', 'knots'] as ImperialUnit[],
     },
     temperature: {
         metric: ['celsius'] as MetricUnit[],
         imperial: ['fahrenheit'] as ImperialUnit[],
-    },
-    area: {
-        metric: ['square_meters', 'hectares'] as MetricUnit[],
-        imperial: ['square_feet', 'acres'] as ImperialUnit[],
-    },
-    speed: {
-        metric: ['kilometers_per_hour'] as MetricUnit[],
-        imperial: ['miles_per_hour'] as ImperialUnit[],
     },
 };
 

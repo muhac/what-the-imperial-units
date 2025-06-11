@@ -1,27 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './neumorphism.css';
 
 import {
     Unit,
     MetricUnit,
     ImperialUnit,
-    baseMap,
     unitCategories,
-    fToC,
-    cToF,
 } from './units';
 import {
     i18n,
     Lang,
 } from './translations';
-
-// Placeholder factor
-const getPlaceholderFactor = (from: Unit, to: Unit): number => {
-    const infoFrom = baseMap[from];
-    const infoTo = baseMap[to];
-    if (infoFrom.category !== infoTo.category || infoFrom.category === 'temperature') return NaN;
-    return infoFrom.factor / infoTo.factor;
-};
+import {
+    getInitialLang,
+    handleLangChange,
+    convert,
+    generateMetricPlaceholder,
+    generateImperialPlaceholder,
+    findClosestRatioUnit,
+} from './App';
 
 interface UnitInputProps {
     value: string;
@@ -34,8 +31,15 @@ interface UnitInputProps {
     onFocus: () => void;
     onBlur: () => void;
     unitLabels: Record<Unit, string>;
+    inputState: 'normal' | 'focused' | 'active' | 'transitioning-out';
 }
 
+
+/**
+ * 单个输入组件
+ * 如果 options 只有 1 个，则不渲染 <select>，而是渲染一个纯文字标签，
+ * 并隐藏下拉小三角，从而避免多余的点击和箭头动画。
+ */
 const UnitInput: React.FC<UnitInputProps> = ({
     value,
     unit,
@@ -47,35 +51,165 @@ const UnitInput: React.FC<UnitInputProps> = ({
     onFocus,
     onBlur,
     unitLabels,
-}) => (
-    <div className="form-group">
-        <label className="form-label">{label}</label>
-        <input
-            type="number"
-            className="neumorphic-input"
-            value={value || ''}
-            placeholder={placeholder}
-            onChange={(e) => onValueChange(e.target.value)}
-            onFocus={onFocus}
-            onBlur={onBlur}
-        />
-        <select
-            className="neumorphic-select"
-            value={unit}
-            onChange={(e) => onUnitChange(e.target.value as Unit)}
-        >
-            {options.map((opt) => (
-                <option key={opt} value={opt}>
-                    {unitLabels[opt]}
-                </option>
-            ))}
-        </select>
-    </div>
-);
+    inputState,
+}) => {
+    const [showCaret, setShowCaret] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const hideCaretTimer = useRef<NodeJS.Timeout | null>(null);
+
+    const getInputClassName = () => {
+        const baseClass = 'neumorphic-input';
+        const caretClass = showCaret ? 'show-caret' : 'hide-caret';
+
+        switch (inputState) {
+            case 'focused':
+                return `${baseClass} input-focused ${caretClass}`;
+            case 'active':
+                return `${baseClass} input-active ${caretClass}`;
+            case 'transitioning-out':
+                return `${baseClass} input-transitioning-out ${caretClass}`;
+            default:
+                return `${baseClass} ${caretClass}`;
+        }
+    };
+
+    // 检查光标位置
+    const checkCaretPosition = useCallback(() => {
+        const input = inputRef.current;
+        if (!input) {
+            setShowCaret(false);
+            return;
+        }
+
+        // 如果没有值，隐藏光标
+        if (!value) {
+            setShowCaret(false);
+            return;
+        }
+
+        // 对于number input，selectionStart可能不可靠，我们使用一个变通方法
+        let caretPosition = 0;
+        try {
+            // 尝试获取selection位置
+            if (input.selectionStart !== null) {
+                caretPosition = input.selectionStart;
+            } else {
+                // 如果selectionStart不可用，使用其他方法
+                // 临时设置为text类型来获取光标位置
+                const originalType = input.type;
+                input.type = 'text';
+                caretPosition = input.selectionStart || 0;
+                input.type = originalType;
+            }
+        } catch (e) {
+            // 如果出错，默认显示光标
+            caretPosition = 1;
+        }
+
+        const textLength = value.length;
+
+        // 清除之前的延迟隐藏定时器
+        if (hideCaretTimer.current) {
+            clearTimeout(hideCaretTimer.current);
+            hideCaretTimer.current = null;
+        }
+
+        // 智能逻辑：在开头和中间立即显示光标，末尾延迟隐藏
+        if (caretPosition >= 0 && caretPosition < textLength) {
+            // 在开头和中间：立即显示光标
+            setShowCaret(true);
+        } else if (caretPosition >= textLength) {
+            // 在末尾：延迟2秒后隐藏光标
+            setShowCaret(true); // 先显示光标
+            hideCaretTimer.current = setTimeout(() => {
+                setShowCaret(false);
+                hideCaretTimer.current = null;
+            }, 1900); // 2秒后隐藏
+        } else {
+            // 其他情况：立即隐藏
+            setShowCaret(false);
+        }
+
+        // 调试输出（可以移除）
+        // console.log('Debug - Value:', value, 'Caret position:', caretPosition, 'Text length:', textLength, 'At end:', caretPosition >= textLength);
+    }, [value]);
+
+    // 监听光标位置变化
+    useEffect(() => {
+        checkCaretPosition();
+    }, [checkCaretPosition]);
+
+    // 清理定时器
+    useEffect(() => {
+        return () => {
+            if (hideCaretTimer.current) {
+                clearTimeout(hideCaretTimer.current);
+            }
+        };
+    }, []);
+
+    const handleKeyUp = () => {
+        setTimeout(checkCaretPosition, 10);
+    };
+
+    const handleClick = () => {
+        setTimeout(checkCaretPosition, 10);
+    };
+
+    const isSingleOption = options.length === 1;
+
+    return (
+        <div className="form-group">
+            <label className="form-label">{label}</label>
+            <input
+                ref={inputRef}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                className={getInputClassName()}
+                value={value || ''}
+                placeholder={placeholder}
+                onChange={(e) => onValueChange(e.target.value)}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                onKeyUp={handleKeyUp}
+                onClick={handleClick}
+            />
+            {isSingleOption ? (
+                // 只有一个候选单位时，显示为静态文本，避免出现下拉箭头和列表
+                <select disabled
+                    className="neumorphic-select neumorphic-select-disabled"
+                    value={unit}
+                    onChange={(e) => onUnitChange(e.target.value as Unit)}
+                >
+                    {options.map((opt) => (
+                        <option key={opt} value={opt}>
+                            {unitLabels[opt]}
+                        </option>
+                    ))}
+                </select>
+            ) : (
+                <select
+                    className="neumorphic-select"
+                    value={unit}
+                    onChange={(e) => onUnitChange(e.target.value as Unit)}
+                >
+                    {options.map((opt) => (
+                        <option key={opt} value={opt}>
+                            {unitLabels[opt]}
+                        </option>
+                    ))}
+                </select>
+            )}
+        </div>
+    );
+};
 
 type CategoryKey = keyof typeof unitCategories;
 
 const NeumorphismApp: React.FC = () => {
+    // console.log('NeumorphismApp component loaded');
+
     const [metricValue, setMetricValue] = useState<string>('');
     const [metricUnit, setMetricUnit] = useState<MetricUnit>('centimeters');
     const [imperialValue, setImperialValue] = useState<string>('');
@@ -84,66 +218,109 @@ const NeumorphismApp: React.FC = () => {
     const [focusedField, setFocusedField] = useState<'metric' | 'imperial' | null>(null);
     const [activeTab, setActiveTab] = useState<CategoryKey>('length');
 
-    const getInitialLang = (): Lang => {
-        const p = new URLSearchParams(window.location.search).get('lang');
-        return (p && Object.keys(i18n).includes(p) ? p : 'en') as Lang;
-    };
+    // 单一状态变量：哪个框是蓝色的
+    const [blueField, setBlueField] = useState<'metric' | 'imperial' | null>(null);
+    // 跟踪哪个字段正在过渡到白色
+    const [transitioningField, setTransitioningField] = useState<'metric' | 'imperial' | null>(null);
+    // 跟踪哪个字段刚刚获得焦点（用于控制变蓝动画）
+    const [justFocused, setJustFocused] = useState<'metric' | 'imperial' | null>(null);
+
+    // 用于取消蓝色框延迟清除的定时器
+    const clearBlueTimer = useRef<NodeJS.Timeout | null>(null);
+
+    // Auto-unit selection feature states
+    const [hasUserInput, setHasUserInput] = useState<boolean>(false);
+    const [hasAutoChanged, setHasAutoChanged] = useState<boolean>(false);
 
     const [lang, setLang] = useState<Lang>(getInitialLang);
     const t = i18n[lang];
 
-    const handleLangChange = (newLang: Lang) => {
-        setLang(newLang);
-        const url = new URL(window.location.href);
-        url.searchParams.set('lang', newLang);
-        window.history.replaceState(null, '', url.toString());
-    };
+    // console.log('NeumorphismApp current state:', {
+    //     metricUnit,
+    //     imperialUnit,
+    //     hasUserInput,
+    //     hasAutoChanged,
+    //     activeTab
+    // });
 
-    // Placeholders
-    const metricPlaceholder =
-        metricUnit === 'celsius' && imperialUnit === 'fahrenheit'
-            ? '°C → °F: (°C × 9/5) + 32'
-            : (() => {
-                const f = getPlaceholderFactor(metricUnit, imperialUnit);
-                return isNaN(f)
-                    ? ''
-                    : `1 ${i18n.abbr.unitLabels[metricUnit]} = ${f.toFixed(2)} ${i18n.abbr.unitLabels[imperialUnit]}`;
-            })();
+    // Placeholders - using imported functions from App.tsx
+    const metricPlaceholder = generateMetricPlaceholder(metricUnit, imperialUnit);
+    const imperialPlaceholder = generateImperialPlaceholder(imperialUnit, metricUnit);
 
-    const imperialPlaceholder =
-        imperialUnit === 'fahrenheit' && metricUnit === 'celsius'
-            ? '°F → °C: (°F - 32) × 5/9'
-            : (() => {
-                const f = getPlaceholderFactor(imperialUnit, metricUnit);
-                return isNaN(f)
-                    ? ''
-                    : `1 ${i18n.abbr.unitLabels[imperialUnit]} = ${f.toFixed(2)} ${i18n.abbr.unitLabels[metricUnit]}`;
-            })();
-
-    // Unified conversion
-    const convert = (value: string, from: Unit, to: Unit): string => {
-        const num = parseFloat(value);
-        if (isNaN(num)) return '';
-        if (from === 'fahrenheit' && to === 'celsius') return fToC(num).toFixed(2);
-        if (from === 'celsius' && to === 'fahrenheit') return cToF(num).toFixed(2);
-        const infoFrom = baseMap[from];
-        const infoTo = baseMap[to];
-        if (infoFrom.category !== infoTo.category) return '';
-        const result = (num * infoFrom.factor) / infoTo.factor;
-        return result.toFixed(2);
-    };
-
+    // 方向：imperial -> metric
     useEffect(() => {
         if (lastUpdated === 'imperial' && focusedField === 'imperial') {
             setMetricValue(convert(imperialValue, imperialUnit, metricUnit));
         }
     }, [imperialValue, imperialUnit, metricUnit, lastUpdated, focusedField]);
 
+    // 方向：metric -> imperial
     useEffect(() => {
         if (lastUpdated === 'metric' && focusedField === 'metric') {
             setImperialValue(convert(metricValue, metricUnit, imperialUnit));
         }
     }, [metricValue, metricUnit, imperialUnit, lastUpdated, focusedField]);
+
+    /**
+     * 处理 focus 变化：
+     * - 若有正在等待的“蓝框变白”计时器则取消，以免 race condition
+     * - 如切换输入框，则旧蓝框进入过渡，新的设为蓝框并触发一次 focused 动画
+     * - 仅在任意框已有内容时才清空，避免刚输入的值被误删
+     */
+    useEffect(() => {
+        if (focusedField) {
+            // 1. 取消可能存在的延迟清除
+            if (clearBlueTimer.current) {
+                clearTimeout(clearBlueTimer.current);
+                clearBlueTimer.current = null;
+                setTransitioningField(null);
+            }
+
+            // 2. 更新蓝框
+            if (blueField !== focusedField) {
+                if (blueField && blueField !== focusedField) {
+                    setTransitioningField(blueField);
+                }
+                setBlueField(focusedField);
+                setJustFocused(focusedField);
+
+                if (metricValue !== '' || imperialValue !== '') {
+                    setMetricValue('');
+                    setImperialValue('');
+                }
+            }
+        }
+    }, [focusedField, blueField, metricValue, imperialValue]);
+
+    /**
+     * 当两个输入框都为空且失焦时，800 ms 后让蓝框淡出
+     */
+    useEffect(() => {
+        if (focusedField === null && metricValue === '' && imperialValue === '' && blueField) {
+            setTransitioningField(blueField);
+            clearBlueTimer.current = setTimeout(() => {
+                setBlueField(null);
+                setTransitioningField(null);
+                clearBlueTimer.current = null;
+            }, 800); // 与动画时长一致
+        }
+    }, [focusedField, metricValue, imperialValue, blueField]);
+
+    // 清理 justFocused 标记
+    useEffect(() => {
+        if (justFocused) {
+            const timer = setTimeout(() => setJustFocused(null), 600);
+            return () => clearTimeout(timer);
+        }
+    }, [justFocused]);
+
+    // 清理 transitioningField，如果外部提前取消也能自动结束
+    useEffect(() => {
+        if (transitioningField) {
+            const timer = setTimeout(() => setTransitioningField(null), 800);
+            return () => clearTimeout(timer);
+        }
+    }, [transitioningField]);
 
     const handleTabChange = (key: CategoryKey) => {
         setActiveTab(key);
@@ -151,11 +328,25 @@ const NeumorphismApp: React.FC = () => {
         setImperialUnit(unitCategories[key].imperial[0]);
         setMetricValue('');
         setImperialValue('');
+        setLastUpdated('imperial');
+        setBlueField(null);
+        // Reset auto-change tracking when switching tabs
+        setHasUserInput(false);
+        setHasAutoChanged(false);
+    };
+
+    // 根据颜色状态计算输入框状态
+    const getInputState = (field: 'metric' | 'imperial'): 'normal' | 'focused' | 'active' | 'transitioning-out' => {
+        if (transitioningField === field) return 'transitioning-out';
+        if (blueField === field) return justFocused === field ? 'focused' : 'active';
+        if (focusedField === field) return 'focused';
+        return 'normal';
     };
 
     const renderCategory = (cat: CategoryKey) => (
         <div className="conversion-wrapper">
             <div className="conversion-container">
+                {/* Metric */}
                 <UnitInput
                     label={t.metricLabel}
                     value={metricValue}
@@ -165,19 +356,60 @@ const NeumorphismApp: React.FC = () => {
                     onValueChange={(val) => {
                         setMetricValue(val);
                         setLastUpdated('metric');
+                        // Mark that user has input values
+                        if (val.trim() !== '') {
+                            setHasUserInput(true);
+                        }
                     }}
                     onUnitChange={(u) => {
-                        setMetricUnit(u as MetricUnit);
+                        const newUnit = u as MetricUnit;
+
+                        // console.log('Metric unit change:', {
+                        //     newUnit,
+                        //     hasUserInput,
+                        //     hasAutoChanged,
+                        //     category: cat
+                        // });
+
+                        // Auto-change imperial unit to closest ratio if:
+                        // 1. User hasn't input any values yet
+                        // 2. This is the first time changing any unit
+                        if (!hasUserInput && !hasAutoChanged) {
+                            const closestImperialUnit = findClosestRatioUnit(newUnit, unitCategories[cat].imperial);
+                            // console.log('Auto-changing imperial unit from', imperialUnit, 'to', closestImperialUnit);
+                            setImperialUnit(closestImperialUnit as ImperialUnit);
+                            setHasAutoChanged(true);
+                        } else {
+                            // console.log('Not auto-changing because:', {
+                            //     hasUserInput,
+                            //     hasAutoChanged
+                            // });
+                        }
+
+                        setMetricUnit(newUnit);
                         setLastUpdated('metric');
-                        if (metricValue) setImperialValue(convert(metricValue, u as Unit, imperialUnit));
+                        if (blueField === 'metric') {
+                            // Use the potentially auto-changed imperial unit for conversion
+                            const targetImperialUnit = !hasUserInput && !hasAutoChanged
+                                ? findClosestRatioUnit(newUnit, unitCategories[cat].imperial)
+                                : imperialUnit;
+                            setImperialValue(convert(metricValue, newUnit as Unit, targetImperialUnit));
+                        } else if (blueField === 'imperial') {
+                            setMetricValue(convert(imperialValue, imperialUnit, newUnit as Unit));
+                        } else {
+                            setMetricValue('');
+                            setImperialValue('');
+                        }
                     }}
                     onFocus={() => setFocusedField('metric')}
                     onBlur={() => setFocusedField(null)}
                     unitLabels={t.unitLabels}
+                    inputState={getInputState('metric')}
                 />
 
                 <div className="conversion-arrow"></div>
 
+                {/* Imperial */}
                 <UnitInput
                     label={t.imperialLabel}
                     value={imperialValue}
@@ -187,15 +419,55 @@ const NeumorphismApp: React.FC = () => {
                     onValueChange={(val) => {
                         setImperialValue(val);
                         setLastUpdated('imperial');
+                        // Mark that user has input values
+                        if (val.trim() !== '') {
+                            setHasUserInput(true);
+                        }
                     }}
                     onUnitChange={(u) => {
-                        setImperialUnit(u as ImperialUnit);
+                        const newUnit = u as ImperialUnit;
+
+                        // console.log('Imperial unit change:', {
+                        //     newUnit,
+                        //     hasUserInput,
+                        //     hasAutoChanged,
+                        //     category: cat
+                        // });
+
+                        // Auto-change metric unit to closest ratio if:
+                        // 1. User hasn't input any values yet
+                        // 2. This is the first time changing any unit
+                        if (!hasUserInput && !hasAutoChanged) {
+                            const closestMetricUnit = findClosestRatioUnit(newUnit, unitCategories[cat].metric);
+                            // console.log('Auto-changing metric unit from', metricUnit, 'to', closestMetricUnit);
+                            setMetricUnit(closestMetricUnit as MetricUnit);
+                            setHasAutoChanged(true);
+                        } else {
+                            // console.log('Not auto-changing because:', {
+                            //     hasUserInput,
+                            //     hasAutoChanged
+                            // });
+                        }
+
+                        setImperialUnit(newUnit);
                         setLastUpdated('imperial');
-                        if (imperialValue) setMetricValue(convert(imperialValue, u as Unit, metricUnit));
+                        if (blueField === 'imperial') {
+                            // Use the potentially auto-changed metric unit for conversion
+                            const targetMetricUnit = !hasUserInput && !hasAutoChanged
+                                ? findClosestRatioUnit(newUnit, unitCategories[cat].metric)
+                                : metricUnit;
+                            setMetricValue(convert(imperialValue, newUnit as Unit, targetMetricUnit));
+                        } else if (blueField === 'metric') {
+                            setImperialValue(convert(metricValue, metricUnit, newUnit as Unit));
+                        } else {
+                            setMetricValue('');
+                            setImperialValue('');
+                        }
                     }}
                     onFocus={() => setFocusedField('imperial')}
                     onBlur={() => setFocusedField(null)}
                     unitLabels={t.unitLabels}
+                    inputState={getInputState('imperial')}
                 />
             </div>
         </div>
@@ -207,16 +479,20 @@ const NeumorphismApp: React.FC = () => {
                 <div className="card-header">
                     <h1 className="card-title">{t.cardTitle}</h1>
                     <select
-                        className="language-selector"
+                        className="language-selector language-selector-desktop"
                         value={lang}
-                        onChange={(e) => handleLangChange(e.target.value as Lang)}
+                        onChange={(e) => handleLangChange(e.target.value as Lang, setLang)}
                     >
                         <option value="en">English</option>
                         <option value="fr">Français</option>
                         <option value="es">Español</option>
-                        <option value="zh">中文</option>
+                        <option value="pt">Português</option>
+                        <option value="zh">中文 (简体)</option>
+                        <option value="zh-tw">中文 (繁體)</option>
                         <option value="ja">日本語</option>
                         <option value="ko">한국어</option>
+                        <option value="hi">हिन्दी</option>
+                        <option value="ru">Русский</option>
                     </select>
                 </div>
 
@@ -238,21 +514,28 @@ const NeumorphismApp: React.FC = () => {
 
                 {/* Info Card */}
                 <div className="info-card">
-                    <h3>💡 {lang === 'zh' ? '转换提示' : lang === 'ja' ? '変換のヒント' : lang === 'ko' ? '변환 팁' : lang === 'fr' ? 'Conseils de conversion' : lang === 'es' ? 'Consejos de conversión' : 'Conversion Tips'}</h3>
-                    <p>
-                        {lang === 'zh'
-                            ? '这个应用帮助您在公制和英制单位之间进行精确转换。选择不同的类别标签来转换长度、重量、体积、温度、面积或速度单位。实时双向转换让您可以在任一侧输入数值，另一侧会自动显示转换结果。'
-                            : lang === 'ja'
-                            ? 'このアプリは、メートル法とヤード・ポンド法の単位を正確に変換するのに役立ちます。異なるカテゴリタブを選択して、長さ、重量、体積、温度、面積、速度の単位を変換できます。リアルタイム双方向変換により、どちらの側に数値を入力しても、もう一方の側に変換結果が自動的に表示されます。'
-                            : lang === 'ko'
-                            ? '이 앱은 미터법과 야드파운드법 단위 간의 정확한 변환을 도와줍니다. 다양한 카테고리 탭을 선택하여 길이, 무게, 부피, 온도, 면적, 속도 단위를 변환할 수 있습니다. 실시간 양방향 변환으로 어느 쪽에 숫자를 입력하든 다른 쪽에 변환 결과가 자동으로 표시됩니다.'
-                            : lang === 'fr'
-                            ? 'Cette application vous aide à convertir avec précision entre les unités métriques et impériales. Sélectionnez différents onglets de catégorie pour convertir les unités de longueur, poids, volume, température, superficie et vitesse. La conversion bidirectionnelle en temps réel vous permet de saisir des valeurs de chaque côté et affiche automatiquement les résultats de conversion de l\'autre côté.'
-                            : lang === 'es'
-                            ? 'Esta aplicación te ayuda a convertir con precisión entre unidades métricas e imperiales. Selecciona diferentes pestañas de categoría para convertir unidades de longitud, peso, volumen, temperatura, área y velocidad. La conversión bidireccional en tiempo real te permite ingresar valores en cualquier lado y mostrar automáticamente los resultados de conversión en el otro lado.'
-                            : 'This app helps you accurately convert between metric and imperial units. Select different category tabs to convert length, weight, volume, temperature, area, and speed units. Real-time bidirectional conversion allows you to input values on either side and automatically displays conversion results on the other side.'
-                        }
-                    </p>
+                    <h3>💡 {t.infoCard.title}</h3>
+                    <p>{t.infoCard.description}</p>
+                </div>
+
+                {/* Mobile Language Selector */}
+                <div className="language-selector-mobile-container">
+                    <select
+                        className="language-selector language-selector-mobile"
+                        value={lang}
+                        onChange={(e) => handleLangChange(e.target.value as Lang, setLang)}
+                    >
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                        <option value="pt">Português</option>
+                        <option value="zh">中文 (简体)</option>
+                        <option value="zh-tw">中文 (繁體)</option>
+                        <option value="ja">日本語</option>
+                        <option value="ko">한국어</option>
+                        <option value="hi">हिन्दी</option>
+                        <option value="ru">Русский</option>
+                    </select>
                 </div>
             </div>
         </div>
