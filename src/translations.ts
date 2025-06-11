@@ -1,7 +1,7 @@
 import {Unit} from './units';
 
-// Supported language keys
-export type Lang = 'abbr' | 'en' | 'zh' | 'zh-tw' | 'fr' | 'es' | 'pt' | 'ja' | 'ko' | 'hi' | 'ru';
+// Supported language keys (following BCP 47 standard for HTML lang attribute)
+export type Lang = 'url' | 'abbr' | 'en' | 'zh' | 'zh-TW' | 'fr' | 'es' | 'pt' | 'ja' | 'ko' | 'hi' | 'ru';
 
 // Localization labels and unit display names
 export const i18n: Record<Lang, {
@@ -16,6 +16,56 @@ export const i18n: Record<Lang, {
         description: string;
     };
 }> = {
+    url: {
+        cardTitle: 'Conv',
+        metricLabel: 'M',
+        imperialLabel: 'I',
+        langLabel: 'L',
+        tabs: {
+            length: 'len',
+            weight: 'wgt',
+            volume: 'vol',
+            area: 'ar',
+            speed: 'spd',
+            temperature: 'tmp',
+        },
+        unitLabels: {
+            centimeters: 'cm',
+            meters: 'm',
+            kilometers: 'km',
+            inch: 'in',
+            foot: 'ft',
+            yard: 'yd',
+            mile: 'mi',
+            grams: 'g',
+            kilograms: 'kg',
+            ounce: 'oz',
+            pound: 'lb',
+            liters: 'l',
+            milliliters: 'ml',
+            gallon: 'gal',
+            fluid_ounce: 'floz',
+            pint: 'pt',
+            quart: 'qt',
+            celsius: 'c',
+            fahrenheit: 'f',
+            square_meters: 'sqm',
+            hectares: 'ha',
+            square_kilometers: 'sqkm',
+            square_feet: 'sqft',
+            acres: 'ac',
+            square_miles: 'sqmi',
+            kilometers_per_hour: 'kmh',
+            miles_per_hour: 'mph',
+            meters_per_second: 'mps',
+            feet_per_second: 'ftps',
+            knots: 'kn',
+        },
+        infoCard: {
+            title: 'Tips',
+            description: 'Convert between metric and imperial units. Select tabs to convert different types. Real-time bidirectional conversion.',
+        },
+    },
     abbr: {
         cardTitle: 'Conv',
         metricLabel: 'M',
@@ -55,7 +105,7 @@ export const i18n: Record<Lang, {
             square_feet: 'ft²',
             acres: 'ac',
             square_miles: 'mi²',
-            kilometers_per_hour: 'kmh',
+            kilometers_per_hour: 'km/h',
             miles_per_hour: 'mph',
             meters_per_second: 'm/s',
             feet_per_second: 'ft/s',
@@ -266,7 +316,7 @@ export const i18n: Record<Lang, {
             description: '这个应用帮助您在公制和英制单位之间进行精确转换。选择不同的类别标签来转换长度、重量、体积、温度、面积或速度单位。实时双向转换让您可以在任一侧输入数值，另一侧会自动显示转换结果。',
         },
     },
-    'zh-tw': {
+    'zh-TW': {
         cardTitle: '單位轉換器',
         metricLabel: '公制',
         imperialLabel: '英制',
