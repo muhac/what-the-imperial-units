@@ -14,6 +14,8 @@ export const i18n: Record<Lang, {
     infoCard: {
         title: string;
         description: string;
+        github?: string;
+        githubLabel?: string;
     };
 }> = {
     url: {
@@ -164,6 +166,8 @@ export const i18n: Record<Lang, {
         infoCard: {
             title: 'Conversion Tips',
             description: 'This app helps you accurately convert between metric and imperial units. Select different category tabs to convert length, weight, volume, temperature, area, and speed units. Real-time bidirectional conversion allows you to input values on either side and automatically displays conversion results on the other side.',
+            github: 'https://github.com/muhac/what-the-imperial-units',
+            githubLabel: 'GitHub Repository:',
         },
     },
     fr: {
@@ -214,6 +218,8 @@ export const i18n: Record<Lang, {
         infoCard: {
             title: 'Conseils de conversion',
             description: 'Cette application vous aide à convertir avec précision entre les unités métriques et impériales. Sélectionnez différents onglets de catégorie pour convertir les unités de longueur, poids, volume, température, superficie et vitesse. La conversion bidirectionnelle en temps réel vous permet de saisir des valeurs de chaque côté et affiche automatiquement les résultats de conversion de l\'autre côté.',
+            github: 'https://github.com/muhac/what-the-imperial-units',
+            githubLabel: 'Dépôt GitHub :',
         },
     },
     es: {
@@ -264,6 +270,8 @@ export const i18n: Record<Lang, {
         infoCard: {
             title: 'Consejos de conversión',
             description: 'Esta aplicación te ayuda a convertir con precisión entre unidades métricas e imperiales. Selecciona diferentes pestañas de categoría para convertir unidades de longitud, peso, volumen, temperatura, área y velocidad. La conversión bidireccional en tiempo real te permite ingresar valores en cualquier lado y mostrar automáticamente los resultados de conversión en el otro lado.',
+            github: 'https://github.com/muhac/what-the-imperial-units',
+            githubLabel: 'Repositorio GitHub:',
         },
     },
     zh: {
@@ -305,15 +313,17 @@ export const i18n: Record<Lang, {
             square_feet: '平方英尺 (ft²)',
             acres: '英亩 (ac)',
             square_miles: '平方英里 (mi²)',
-            kilometers_per_hour: '千米/小时 (km/h)',
-            miles_per_hour: '英里/小时 (mph)',
-            meters_per_second: '米/秒 (m/s)',
-            feet_per_second: '英尺/秒 (ft/s)',
+            kilometers_per_hour: '千米 / 小时 (km/h)',
+            miles_per_hour: '英里 / 小时 (mph)',
+            meters_per_second: '米 / 秒 (m/s)',
+            feet_per_second: '英尺 / 秒 (ft/s)',
             knots: '节 (kn)',
         },
         infoCard: {
             title: '转换提示',
             description: '这个应用帮助您在公制和英制单位之间进行精确转换。选择不同的类别标签来转换长度、重量、体积、温度、面积或速度单位。实时双向转换让您可以在任一侧输入数值，另一侧会自动显示转换结果。',
+            github: 'https://github.com/muhac/what-the-imperial-units',
+            githubLabel: 'GitHub 仓库地址：',
         },
     },
     'zh-TW': {
@@ -355,15 +365,17 @@ export const i18n: Record<Lang, {
             square_feet: '平方英尺 (ft²)',
             acres: '英畝 (ac)',
             square_miles: '平方英里 (mi²)',
-            kilometers_per_hour: '公里/小時 (km/h)',
-            miles_per_hour: '英里/小時 (mph)',
-            meters_per_second: '公尺/秒 (m/s)',
-            feet_per_second: '英尺/秒 (ft/s)',
+            kilometers_per_hour: '公里 / 小時 (km/h)',
+            miles_per_hour: '英里 / 小時 (mph)',
+            meters_per_second: '公尺 / 秒 (m/s)',
+            feet_per_second: '英尺 / 秒 (ft/s)',
             knots: '節 (kn)',
         },
         infoCard: {
             title: '轉換提示',
             description: '這個應用程式幫助您在公制和英制單位之間進行精確轉換。選擇不同的類別標籤來轉換長度、重量、體積、溫度、面積或速度單位。即時雙向轉換讓您可以在任一側輸入數值，另一側會自動顯示轉換結果。',
+            github: 'https://github.com/muhac/what-the-imperial-units',
+            githubLabel: 'GitHub 倉庫地址：',
         },
     },
     ja: {
@@ -413,7 +425,9 @@ export const i18n: Record<Lang, {
         },
         infoCard: {
             title: '変換のヒント',
-            description: 'このアプリは、メートル法とヤード・ポンド法の単位を正确に変換するのに役立ちます。異なるカテゴリタブを選択して、長さ、重量、体积、温度、面積、速度の単位を変換できます。リアルタイム双方向変換により、どちらの側に数値を入力しても、もう一方の侧に変換結果が自動的に表示されます。',
+            description: 'このアプリは、メートル法とヤード・ポンド法の単位を正確に変換するのに役立ちます。異なるカテゴリタブを選択して、長さ、重量、体積、温度、面積、速度の単位を変換できます。リアルタイム双方向変換により、どちらの側に数値を入力しても、もう一方の側に変換結果が自動的に表示されます。',
+            github: 'https://github.com/muhac/what-the-imperial-units',
+            githubLabel: 'GitHub リポジトリ：',
         },
     },
     ko: {
@@ -464,6 +478,8 @@ export const i18n: Record<Lang, {
         infoCard: {
             title: '변환 팁',
             description: '이 앱은 미터법과 야드파운드법 단위 간의 정확한 변환을 도와줍니다. 다양한 카테고리 탭을 선택하여 길이, 무게, 부피, 온도, 면적, 속도 단위를 변환할 수 있습니다. 실시간 양방향 변환으로 어느 쪽에 숫자를 입력하든 다른 쪽에 변환 결과가 자동으로 표시됩니다.',
+            github: 'https://github.com/muhac/what-the-imperial-units',
+            githubLabel: 'GitHub 저장소:',
         },
     },
     pt: {
@@ -514,6 +530,8 @@ export const i18n: Record<Lang, {
         infoCard: {
             title: 'Dicas de Conversão',
             description: 'Este aplicativo ajuda você a converter com precisão entre unidades métricas e imperiais. Selecione diferentes abas de categoria para converter unidades de comprimento, peso, volume, temperatura, área e velocidade. A conversão bidirecional em tempo real permite que você insira valores em qualquer lado e exiba automaticamente os resultados de conversão do outro lado.',
+            github: 'https://github.com/muhac/what-the-imperial-units',
+            githubLabel: 'Repositório GitHub:',
         },
     },
     hi: {
@@ -564,6 +582,8 @@ export const i18n: Record<Lang, {
         infoCard: {
             title: 'रूपांतरण सुझाव',
             description: 'यह ऐप आपको मेट्रिक और इम्पीरियल यूनिट्स के बीच सटीक रूपांतरण में मदद करता है। लंबाई, वजन, आयतन, तापमान, क्षेत्रफल और गति की यूनिट्स को कन्वर्ट करने के लिए विभिन्न कैटेगरी टैब्स का चयन करें। रियल-टाइम द्विदिशीय रूपांतरण आपको किसी भी तरफ मान दर्ज करने की अनुमति देता है और दूसरी तरफ स्वचालित रूप से रूपांतरण परिणाम प्रदर्शित करता है।',
+            github: 'https://github.com/muhac/what-the-imperial-units',
+            githubLabel: 'GitHub रिपॉजिटरी:',
         },
     },
     ru: {
@@ -614,6 +634,8 @@ export const i18n: Record<Lang, {
         infoCard: {
             title: 'Советы по конвертации',
             description: 'Это приложение поможет вам точно конвертировать между метрическими и имперскими единицами. Выберите различные категории вкладок для конвертации единиц длины, веса, объёма, температуры, площади и скорости. Двунаправленная конвертация в реальном времени позволяет вводить значения с любой стороны и автоматически отображает результаты конвертации с другой стороны.',
+            github: 'https://github.com/muhac/what-the-imperial-units',
+            githubLabel: 'GitHub репозиторий:',
         },
     },
 };
