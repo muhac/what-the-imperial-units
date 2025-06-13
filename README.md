@@ -1,17 +1,70 @@
 # What the Imperial Units
 
-> I have no idea what a gallon is, nor a pint, nor a foot, nor a yard. I am not even sure what a mile is.
+A modern, responsive unit converter for converting between metric and imperial/customary units with PWA support.
 
-Please use this converter to convert between metric system and imperial system / customary units.
+**🚀 [Live Demo](https://units.muhan.org)**
+
+## Table of Contents
+
+- [What the Imperial Units](#what-the-imperial-units)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Quick Start](#quick-start)
+  - [Install as App](#install-as-app)
+    - [Safari (iOS/iPadOS)](#safari-iosipados)
+    - [Chrome/Edge (Android/Desktop)](#chromeedge-androiddesktop)
+    - [Firefox (Android/Desktop)](#firefox-androiddesktop)
+  - [URL Parameters for Deep Linking](#url-parameters-for-deep-linking)
+    - [Parameters](#parameters)
+    - [Examples](#examples)
+    - [Element IDs for Automation](#element-ids-for-automation)
+    - [Available Units by Category](#available-units-by-category)
+  - [Development](#development)
+  - [Acknowledgments](#acknowledgments)
 
 ## Features
 
 - **Multi-category conversions**: Length, weight, volume, area, speed, and temperature
 - **Real-time conversion**: Automatic conversion as you type
 - **Smart unit suggestions**: Automatic pairing of related units
-- **Multi-language support**: Available in 10 languages
+- **Multi-language support**: English, 中文 (简体), 中文 (繁體), Français, Español, Português, 日本語, 한국어, हिन्दी, Русский
 - **URL bookmarking**: Save and share specific conversions via URL parameters
+- **Progressive Web App**: Works offline, installable on all devices
 - **Responsive design**: Works on desktop and mobile devices
+
+## Quick Start
+
+1. Select a category (Length, Weight, Volume, Area, Speed, or Temperature)
+2. Choose your source and target units from the dropdown menus
+3. Enter a value in either field - conversion happens automatically
+4. Use the URL to bookmark or share specific conversions
+
+## Install as App
+
+### Safari (iOS/iPadOS)
+
+You can add this app to your iOS home screen for quick access:
+
+1. Open the app in Safari on your iPhone or iPad
+2. Tap the **Share** button (square with arrow pointing up) at the bottom of the screen
+3. Scroll down and tap **"Add to Home Screen"**
+4. Customize the app name if desired, then tap **"Add"**
+
+The app will appear on your home screen with its own icon and behave like a native app when launched.
+
+### Chrome/Edge (Android/Desktop)
+
+1. Open the app in Chrome or Edge
+2. Look for the **Install** button in the address bar or menu
+3. Click **Install** and confirm
+4. The app will be added to your device as a standalone application
+
+### Firefox (Android/Desktop)
+
+1. Open the app in Firefox
+2. Tap the menu button (three dots)
+3. Select **"Install"** or **"Add to Home Screen"**
+4. Follow the prompts to install
 
 ## URL Parameters for Deep Linking
 
@@ -30,30 +83,20 @@ All parameter names and values use ultra-short forms for maximum URL compactness
 
 ### Examples
 
-**Length conversion (10 meters to feet):**
-```
-?c=len&m=m&i=ft&v=10&u=m
-```
+**Length conversion (10 meters to feet):**  
+[`https://units.muhan.org?c=len&m=m&i=ft&v=10&u=m`](https://units.muhan.org?c=len&m=m&i=ft&v=10&u=m)
 
-**Weight conversion (150 pounds to kilograms) in Spanish:**
-```
-?c=wgt&m=kg&i=lb&v=150&u=i&lang=es
-```
+**Weight conversion (150 pounds to kilograms) in Spanish:**  
+[`https://units.muhan.org?c=wgt&m=kg&i=lb&v=150&u=i&lang=es`](https://units.muhan.org?c=wgt&m=kg&i=lb&v=150&u=i&lang=es)
 
-**Volume conversion (20 liters to gallons) in Chinese:**
-```
-?c=vol&m=l&i=gal&v=20&u=m&lang=zh
-```
+**Volume conversion (20 liters to gallons) in Chinese:**  
+[`https://units.muhan.org?c=vol&m=l&i=gal&v=20&u=m&lang=zh`](https://units.muhan.org?c=vol&m=l&i=gal&v=20&u=m&lang=zh)
 
-**Temperature conversion (25 Celsius to Fahrenheit):**
-```
-?c=tmp&m=c&i=f&v=25&u=m
-```
+**Temperature conversion (25 Celsius to Fahrenheit):**  
+[`https://units.muhan.org?c=tmp&m=c&i=f&v=25&u=m`](https://units.muhan.org?c=tmp&m=c&i=f&v=25&u=m)
 
-**Speed conversion (60 mph to km/h):**
-```
-?c=spd&m=kmh&i=mph&v=60&u=i
-```
+**Speed conversion (60 mph to km/h):**  
+[`https://units.muhan.org?c=spd&m=kmh&i=mph&v=60&u=i`](https://units.muhan.org?c=spd&m=kmh&i=mph&v=60&u=i)
 
 ### Element IDs for Automation
 
@@ -66,12 +109,33 @@ All interactive elements have unique IDs for automation and testing:
 
 ### Available Units by Category
 
-**Length**: centimeters, meters, kilometers, inch, foot, yard, mile  
-**Weight**: grams, kilograms, ounce, pound  
-**Volume**: liters, milliliters, gallon, fluid_ounce, pint, quart  
-**Area**: square_meters, hectares, square_kilometers, square_feet, acres, square_miles  
-**Speed**: kilometers_per_hour, meters_per_second, miles_per_hour, feet_per_second, knots  
-**Temperature**: celsius, fahrenheit
+**Length**: `centimeters`, `meters`, `kilometers`, `inch`, `foot`, `yard`, `mile`  
+**Weight**: `grams`, `kilograms`, `ounce`, `pound`  
+**Volume**: `liters`, `milliliters`, `gallon`, `fluid_ounce`, `pint`, `quart`  
+**Area**: `square_meters`, `hectares`, `square_kilometers`, `square_feet`, `acres`, `square_miles`  
+**Speed**: `kilometers_per_hour`, `meters_per_second`, `miles_per_hour`, `feet_per_second`, `knots`  
+**Temperature**: `celsius`, `fahrenheit`
+
+## Development
+
+This is a React TypeScript application with PWA capabilities.
+
+**Tech Stack:**
+- React 18 with TypeScript
+- CSS Grid and Flexbox for responsive layout
+- Service Worker for offline functionality
+- Web App Manifest for PWA features
+
+**Local Development:**
+```bash
+npm install
+npm start
+```
+
+**Build for Production:**
+```bash
+npm run build
+```
 
 ## Acknowledgments
 
