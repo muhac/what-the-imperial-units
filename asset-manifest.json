@@ -1,15 +1,16 @@
 {
   "files": {
     "main.css": "/what-the-imperial-units/static/css/main.675f3302.css",
-    "main.js": "/what-the-imperial-units/static/js/main.98f9ef82.js",
+    "main.js": "/what-the-imperial-units/static/js/main.49bf3665.js",
     "static/js/453.74b20ae9.chunk.js": "/what-the-imperial-units/static/js/453.74b20ae9.chunk.js",
+    "service-worker.js": "/what-the-imperial-units/service-worker.js",
     "index.html": "/what-the-imperial-units/index.html",
     "main.675f3302.css.map": "/what-the-imperial-units/static/css/main.675f3302.css.map",
-    "main.98f9ef82.js.map": "/what-the-imperial-units/static/js/main.98f9ef82.js.map",
+    "main.49bf3665.js.map": "/what-the-imperial-units/static/js/main.49bf3665.js.map",
     "453.74b20ae9.chunk.js.map": "/what-the-imperial-units/static/js/453.74b20ae9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.675f3302.css",
-    "static/js/main.98f9ef82.js"
+    "static/js/main.49bf3665.js"
   ]
 }
