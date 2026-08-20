@@ -2,7 +2,7 @@
 
 A modern, responsive unit converter for converting between metric and imperial/customary units with PWA support.
 
-**🚀 [Live Demo](https://units.muhan.org)**
+**🚀 [Live Demo](https://muhac.github.io/what-the-imperial-units/)**
 
 ## Table of Contents
 
@@ -84,19 +84,19 @@ All parameter names and values use ultra-short forms for maximum URL compactness
 ### Examples
 
 **Length conversion (10 meters to feet):**  
-[`https://units.muhan.org?c=len&m=m&i=ft&v=10&u=m`](https://units.muhan.org?c=len&m=m&i=ft&v=10&u=m)
+[`https://muhac.github.io/what-the-imperial-units/?c=len&m=m&i=ft&v=10&u=m`](https://muhac.github.io/what-the-imperial-units/?c=len&m=m&i=ft&v=10&u=m)
 
 **Weight conversion (150 pounds to kilograms) in Spanish:**  
-[`https://units.muhan.org?c=wgt&m=kg&i=lb&v=150&u=i&lang=es`](https://units.muhan.org?c=wgt&m=kg&i=lb&v=150&u=i&lang=es)
+[`https://muhac.github.io/what-the-imperial-units/?c=wgt&m=kg&i=lb&v=150&u=i&lang=es`](https://muhac.github.io/what-the-imperial-units/?c=wgt&m=kg&i=lb&v=150&u=i&lang=es)
 
 **Volume conversion (20 liters to gallons) in Chinese:**  
-[`https://units.muhan.org?c=vol&m=l&i=gal&v=20&u=m&lang=zh`](https://units.muhan.org?c=vol&m=l&i=gal&v=20&u=m&lang=zh)
+[`https://muhac.github.io/what-the-imperial-units/?c=vol&m=l&i=gal&v=20&u=m&lang=zh`](https://muhac.github.io/what-the-imperial-units/?c=vol&m=l&i=gal&v=20&u=m&lang=zh)
 
 **Temperature conversion (25 Celsius to Fahrenheit):**  
-[`https://units.muhan.org?c=tmp&m=c&i=f&v=25&u=m`](https://units.muhan.org?c=tmp&m=c&i=f&v=25&u=m)
+[`https://muhac.github.io/what-the-imperial-units/?c=tmp&m=c&i=f&v=25&u=m`](https://muhac.github.io/what-the-imperial-units/?c=tmp&m=c&i=f&v=25&u=m)
 
 **Speed conversion (60 mph to km/h):**  
-[`https://units.muhan.org?c=spd&m=kmh&i=mph&v=60&u=i`](https://units.muhan.org?c=spd&m=kmh&i=mph&v=60&u=i)
+[`https://muhac.github.io/what-the-imperial-units/?c=spd&m=kmh&i=mph&v=60&u=i`](https://muhac.github.io/what-the-imperial-units/?c=spd&m=kmh&i=mph&v=60&u=i)
 
 ### Element IDs for Automation
 

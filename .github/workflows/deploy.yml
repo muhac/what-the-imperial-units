@@ -32,4 +32,3 @@ jobs:
           publish_dir: ./build                       # 构建输出目录
           publish_branch: gh-pages                   # 发布到 gh-pages 分支
           allow_empty_commit: true                   # 当无变动时允许空提交
-          cname: units.muhan.org                     # 自定义域名，生成 CNAME 文件
